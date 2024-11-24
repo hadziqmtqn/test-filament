@@ -25,6 +25,7 @@ class DatabaseSeeder extends Seeder
 
         Category::factory()
             ->count(5)
+            ->hasSubCategories(4)
             ->hasPosts(10)
             ->create();
     }

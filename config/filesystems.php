@@ -45,7 +45,7 @@ return [
             'throw' => false,
         ],
 
-        's3' => [
+        /*'s3' => [
             'driver' => 's3',
             'key' => env('AWS_ACCESS_KEY_ID'),
             'secret' => env('AWS_SECRET_ACCESS_KEY'),
@@ -55,8 +55,20 @@ return [
             'endpoint' => env('AWS_ENDPOINT'),
             'use_path_style_endpoint' => env('AWS_USE_PATH_STYLE_ENDPOINT', false),
             'throw' => false,
-        ],
+        ],*/
 
+        's3' => [
+            'driver' => 's3',
+            'key' => env('OBJECT_STORAGE_KEY'),
+            'secret' => env('OBJECT_STORAGE_SECRET'),
+            'region' => env('OBJECT_STORAGE_REGION'),
+            'bucket' => env('OBJECT_STORAGE_BUCKET'),
+            'url' => env('OBJECT_STORAGE_URL'),
+            'endpoint' => env('OBJECT_STORAGE_ENDPOINT'),
+            'use_path_style_endpoint' => env('OBJECT_STORAGE_USE_PATH_STYLE', false),
+            'throw' => false,
+            'visibility' => 'public'
+        ],
     ],
 
     /*

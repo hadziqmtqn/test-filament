@@ -5,12 +5,14 @@ namespace App\Filament\Resources;
 use App\Filament\Resources\PostResource\Pages;
 use App\Models\Category;
 use App\Models\Post;
+use App\Models\SubCategory;
 use Filament\Forms\Components\FileUpload;
-use Filament\Forms\Components\MarkdownEditor;
 use Filament\Forms\Components\Placeholder;
+use Filament\Forms\Components\RichEditor;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Form;
+use Filament\Forms\Get;
 use Filament\Resources\Resource;
 use Filament\Tables\Actions\BulkActionGroup;
 use Filament\Tables\Actions\DeleteAction;
@@ -21,6 +23,8 @@ use Filament\Tables\Columns\ImageColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Storage;
 
 class PostResource extends Resource
 {
@@ -37,16 +41,27 @@ class PostResource extends Resource
                 Select::make('category_id')
                     ->label('Category')
                     ->options(Category::pluck('name', 'id'))
+                    ->live()
                     ->required(),
+
+                Select::make('sub_category_id')
+                    ->label('Sub Category')
+                    ->options(fn (Get $get): Collection => SubCategory::query()
+                    ->where('category_id', $get('category_id'))
+                    ->pluck('name', 'id')),
 
                 TextInput::make('title')
                     ->required(),
 
-                MarkdownEditor::make('content')
+                RichEditor::make('content')
+                    ->fileAttachmentsDisk('s3')
+                    ->fileAttachmentsDirectory('attachments')
                     ->required(),
 
                 FileUpload::make('image')
                     ->label('Image')
+                    ->disk('s3')
+                    ->directory('thumbnail')
                     ->acceptedFileTypes(['image/png', 'image/jpg', 'image/jpeg'])
                     ->maxSize(500)
                     ->nullable(),
@@ -67,7 +82,10 @@ class PostResource extends Resource
             ->columns([
                 TextColumn::make('category.name'),
 
-                ImageColumn::make('image'),
+                TextColumn::make('subCategory.name'),
+
+                ImageColumn::make('image_url')
+                    ->label('Thumbnail'),
 
                 TextColumn::make('title')
                     ->searchable()

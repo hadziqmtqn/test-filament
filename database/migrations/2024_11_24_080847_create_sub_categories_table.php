@@ -7,13 +7,11 @@ use Illuminate\Support\Facades\Schema;
 return new class extends Migration {
     public function up(): void
     {
-        Schema::create('posts', function (Blueprint $table) {
+        Schema::create('sub_categories', function (Blueprint $table) {
             $table->id();
             $table->string('slug')->unique();
             $table->unsignedBigInteger('category_id');
-            $table->string('image')->nullable();
-            $table->string('title');
-            $table->longText('content');
+            $table->string('name')->unique();
             $table->timestamps();
 
             $table->foreign('category_id')->references('id')->on('categories')->restrictOnDelete();
@@ -22,6 +20,6 @@ return new class extends Migration {
 
     public function down(): void
     {
-        Schema::dropIfExists('posts');
+        Schema::dropIfExists('sub_categories');
     }
 };
