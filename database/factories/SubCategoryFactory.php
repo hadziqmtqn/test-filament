@@ -13,7 +13,7 @@ class SubCategoryFactory extends Factory
     public function definition(): array
     {
         return [
-            'name' => $this->faker->text(10),
+            'name' => $this->faker->realText(20),
             'created_at' => Carbon::now(),
             'updated_at' => Carbon::now(),
         ];
