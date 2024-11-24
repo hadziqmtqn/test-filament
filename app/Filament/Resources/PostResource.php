@@ -109,6 +109,6 @@ class PostResource extends Resource
 
     public static function getGloballySearchableAttributes(): array
     {
-        return ['title'];
+        return ['title', 'content'];
     }
 }
