@@ -18,15 +18,22 @@ class DatabaseSeeder extends Seeder
     {
         // User::factory(10)->create();
 
-        $role = Role::create(['name' => 'Admin']);
-
-        $user = User::factory()->create([
+        $superAdminrole = Role::create(['name' => 'super_admin']);
+        $superAdmin = User::factory()->create([
             'name' => 'Admin',
             'email' => 'admin@admin.com',
             'password' => Hash::make('12345678')
         ]);
+        $superAdmin->assignRole($superAdminrole);
 
-        $user->assignRole($role);
+        $userRole = Role::create(['name' => 'user']);
+        $user = User::factory()->create([
+            'name' => 'User',
+            'email' => 'user@admin.com',
+            'password' => Hash::make('12345678')
+        ]);
+
+        $user->assignRole($userRole);
 
         Category::factory()
             ->count(5)
