@@ -23,6 +23,8 @@ class UserResource extends Resource implements HasShieldPermissions
 {
     protected static ?string $model = User::class;
 
+    protected static ?string $navigationGroup = 'User Management';
+
     protected static ?string $slug = 'users';
 
     protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
@@ -73,12 +75,6 @@ class UserResource extends Resource implements HasShieldPermissions
                     ->label('Last Modified Date')
                     ->content(fn(?User $record): string => $record?->updated_at?->diffForHumans() ?? '-'),
             ]);
-    }
-
-    public static function afterSave($record, $data): void
-    {
-        // Sinkronisasi roles
-        $record->syncRoles($data['roles'] ?? []);
     }
 
     public static function table(Table $table): Table
