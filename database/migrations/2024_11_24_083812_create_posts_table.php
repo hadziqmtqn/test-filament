@@ -11,9 +11,10 @@ return new class extends Migration {
             $table->id();
             $table->string('slug')->unique();
             $table->unsignedBigInteger('category_id');
+            $table->unsignedBigInteger('sub_category_id')->nullable();
             $table->string('title');
             $table->longText('content');
-            $table->unsignedBigInteger('sub_category_id')->nullable();
+            $table->string('tags')->nullable();
             $table->timestamps();
 
             $table->foreign('category_id')->references('id')->on('categories')->restrictOnDelete();

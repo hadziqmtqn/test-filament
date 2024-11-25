@@ -10,12 +10,14 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Str;
+use Spatie\MediaLibrary\HasMedia;
+use Spatie\MediaLibrary\InteractsWithMedia;
 use Spatie\Permission\Traits\HasRoles;
 
-class User extends Authenticatable implements FilamentUser
+class User extends Authenticatable implements FilamentUser, HasMedia
 {
     /** @use HasFactory<UserFactory> */
-    use HasFactory, Notifiable, HasRoles, HasPanelShield;
+    use HasFactory, Notifiable, HasRoles, HasPanelShield, InteractsWithMedia;
 
     /**
      * The attributes that are mass assignable.
@@ -59,5 +61,10 @@ class User extends Authenticatable implements FilamentUser
         static::creating(function (User $user) {
             $user->username = Str::uuid()->toString();
         });
+    }
+
+    public function getRouteKeyName(): string
+    {
+        return 'username';
     }
 }

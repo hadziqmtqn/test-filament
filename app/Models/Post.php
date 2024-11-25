@@ -15,10 +15,18 @@ class Post extends Model implements HasMedia
     protected $fillable = [
         'slug',
         'category_id',
+        'sub_category_id',
         'title',
         'content',
-        'sub_category_id'
+        'tags'
     ];
+
+    protected function casts(): array
+    {
+        return [
+            'tags' => 'array'
+        ];
+    }
 
     public function registerMediaCollections(): void
     {

@@ -11,9 +11,11 @@ use Filament\Forms\Components\Placeholder;
 use Filament\Forms\Components\RichEditor;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\SpatieMediaLibraryFileUpload;
+use Filament\Forms\Components\TagsInput;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Form;
 use Filament\Forms\Get;
+use Filament\Forms\Set;
 use Filament\Resources\Resource;
 use Filament\Tables\Actions\BulkActionGroup;
 use Filament\Tables\Actions\DeleteAction;
@@ -42,16 +44,18 @@ class PostResource extends Resource
                 Select::make('category_id')
                     ->label('Category')
                     ->options(Category::pluck('name', 'id'))
-                    ->live()
-                    ->searchable()
                     ->preload()
+                    ->live()
+                    ->afterStateUpdated(fn (Set $set) => $set('sub_category_id', null))
+                    ->searchable()
                     ->required(),
 
                 Select::make('sub_category_id')
                     ->label('Sub Category')
-                    ->options(fn (Get $get): Collection => SubCategory::query()
-                    ->where('category_id', $get('category_id'))
+                    ->options(fn (Get $get): Collection => SubCategory::query()->where('category_id', $get('category_id'))
                     ->pluck('name', 'id'))
+                    ->preload()
+                    ->live()
                     ->searchable(),
 
                 TextInput::make('title')
@@ -63,6 +67,10 @@ class PostResource extends Resource
                     ->fileAttachmentsDirectory('attachments')
                     ->columnSpan('full')
                     ->required(),
+
+                TagsInput::make('tags')
+                    ->separator()
+                    ->columnSpan('full'),
 
                 SpatieMediaLibraryFileUpload::make('thumbnail')
                     ->disk('s3')
@@ -100,6 +108,9 @@ class PostResource extends Resource
 
                 TextColumn::make('title')
                     ->searchable()
+                    ->sortable(),
+
+                TextColumn::make('created_at')
                     ->sortable(),
             ])
             ->filters([

@@ -5,15 +5,17 @@ namespace App\Filament\Resources;
 use App\Filament\Resources\UserResource\Pages;
 use App\Models\User;
 use BezhanSalleh\FilamentShield\Contracts\HasShieldPermissions;
-use Filament\Forms\Components\Placeholder;
 use Filament\Forms\Components\Select;
+use Filament\Forms\Components\SpatieMediaLibraryFileUpload;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
+use Filament\Support\Enums\FontWeight;
 use Filament\Tables\Actions\BulkActionGroup;
 use Filament\Tables\Actions\DeleteAction;
 use Filament\Tables\Actions\DeleteBulkAction;
 use Filament\Tables\Actions\EditAction;
+use Filament\Tables\Columns\SpatieMediaLibraryImageColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
 use Illuminate\Support\Facades\Hash;
@@ -46,6 +48,12 @@ class UserResource extends Resource implements HasShieldPermissions
     {
         return $form
             ->schema([
+                SpatieMediaLibraryFileUpload::make('avatar')
+                    ->collection('avatar')
+                    ->maxSize(500)
+                    ->columnSpan('full')
+                    ->avatar(),
+
                 TextInput::make('name')
                     ->required(),
 
@@ -66,14 +74,6 @@ class UserResource extends Resource implements HasShieldPermissions
                     ->dehydrateStateUsing(fn ($state) => $state ? Hash::make($state) : null) // Hash password jika ada
                     ->dehydrated(fn ($state) => filled($state)) // Tidak menyertakan field jika kosong
                     ->required(fn ($context) => $context === 'create'), // Wajib diisi hanya pada create
-
-                Placeholder::make('created_at')
-                    ->label('Created Date')
-                    ->content(fn(?User $record): string => $record?->created_at?->diffForHumans() ?? '-'),
-
-                Placeholder::make('updated_at')
-                    ->label('Last Modified Date')
-                    ->content(fn(?User $record): string => $record?->updated_at?->diffForHumans() ?? '-'),
             ]);
     }
 
@@ -81,10 +81,14 @@ class UserResource extends Resource implements HasShieldPermissions
     {
         return $table
             ->columns([
+                SpatieMediaLibraryImageColumn::make('avatar')
+                    ->collection('avatar')
+                    ->circular(),
+
                 TextColumn::make('name')
+                    ->weight(FontWeight::Bold)
                     ->searchable()
                     ->sortable(),
-
                 TextColumn::make('email')
                     ->searchable()
                     ->sortable(),
@@ -112,7 +116,7 @@ class UserResource extends Resource implements HasShieldPermissions
         return [
             'index' => Pages\ListUsers::route('/'),
             'create' => Pages\CreateUser::route('/create'),
-            'edit' => Pages\EditUser::route('/{record}/edit'),
+            'edit' => Pages\EditUser::route('/{record:username}/edit'),
         ];
     }
 
