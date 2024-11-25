@@ -60,14 +60,13 @@ class PostResource extends Resource
                     ->required(),
 
                 SpatieMediaLibraryFileUpload::make('thumbnail')
-                    ->label('Thumbnail')
                     ->disk('s3')
-                    ->conversionsDisk('s3')
+                    ->visibility('public')
+                    ->collection('thumbnail')
                     ->acceptedFileTypes(['image/png', 'image/jpg', 'image/jpeg'])
                     ->maxSize(500)
-                    ->collection('thumbnail')
                     ->columnSpan('full')
-                    ->nullable(),
+                    ->openable(),
 
                 Placeholder::make('created_at')
                     ->label('Created Date')
