@@ -16,6 +16,7 @@ class PostFactory extends Factory
         return [
             'title' => $this->faker->text(100),
             'content' => $this->faker->paragraph(),
+            'status' => $this->faker->randomElement(['draft', 'published']),
             'created_at' => Carbon::now(),
             'updated_at' => Carbon::now(),
 

@@ -18,7 +18,8 @@ class Post extends Model implements HasMedia
         'sub_category_id',
         'title',
         'content',
-        'tags'
+        'tags',
+        'status'
     ];
 
     protected function casts(): array

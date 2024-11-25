@@ -15,6 +15,7 @@ return new class extends Migration {
             $table->string('title');
             $table->longText('content');
             $table->string('tags')->nullable();
+            $table->enum('status', ['draft', 'published'])->default('draft');
             $table->timestamps();
 
             $table->foreign('category_id')->references('id')->on('categories')->restrictOnDelete();

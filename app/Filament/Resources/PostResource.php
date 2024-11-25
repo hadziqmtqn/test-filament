@@ -7,6 +7,7 @@ use App\Models\Category;
 use App\Models\Post;
 use App\Models\SubCategory;
 use Exception;
+use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\Placeholder;
 use Filament\Forms\Components\RichEditor;
 use Filament\Forms\Components\Select;
@@ -25,9 +26,10 @@ use Filament\Tables\Actions\ViewAction;
 use Filament\Tables\Columns\SpatieMediaLibraryImageColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\Filter;
-use Filament\Tables\Filters\SelectFilter;
+use Filament\Tables\Filters\Indicator;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
 
 class PostResource extends Resource
@@ -82,6 +84,15 @@ class PostResource extends Resource
                     ->columnSpan('full')
                     ->openable(),
 
+                Select::make('status')
+                    ->options([
+                        'draft' => 'Draft',
+                        'published' => 'Published',
+                    ])
+                    ->required()
+                    ->columnSpanFull()
+                    ->native(false),
+
                 Placeholder::make('created_at')
                     ->label('Created Date')
                     ->content(fn(?Post $record): string => $record?->created_at?->diffForHumans() ?? '-'),
@@ -113,9 +124,16 @@ class PostResource extends Resource
 
                 TextColumn::make('created_at')
                     ->sortable(),
+
+                TextColumn::make('status')
+                    ->badge()
+                    ->color(fn (string $state): string => match ($state) {
+                        'draft' => 'gray',
+                        'published' => 'success',
+                    })
             ])
             ->filters([
-                Filter::make('category')
+                Filter::make('category_id')
                     ->form([
                         Select::make('category_id')
                             ->options(Category::pluck('name', 'id'))
@@ -133,9 +151,62 @@ class PostResource extends Resource
                             ->searchable()
                             ->live(),
                     ])
+                    ->indicateUsing(function (array $data): array {
+                        $indicators = [];
+
+                        if ($data['category_id'] ?? null) {
+                            $categoryName = Category::find($data['category_id'])->name ?? 'Unknown';
+                            $indicators[] = Indicator::make('Category: ' . $categoryName)
+                                ->removeField('category_id');
+                        }
+
+                        if ($data['sub_category_id'] ?? null) {
+                            $subCategoryName = SubCategory::find($data['sub_category_id'])->name ?? 'Unknown';
+                            $indicators[] = Indicator::make('Sub Category: ' . $subCategoryName)
+                                ->removeField('sub_category_id');
+                        }
+
+                        return $indicators;
+                    })
                     ->query(function (Builder $query, array $data) {
                         return $query->when($data['category_id'], fn (Builder $query, $data): Builder => $query->where('category_id', $data))
                             ->when($data['sub_category_id'], fn (Builder $query, $data): Builder => $query->where('sub_category_id', $data));
+                    }),
+
+                Filter::make('created_at')
+                    ->form([
+                        DatePicker::make('created_from')
+                            ->native(false)
+                            ->closeOnDateSelection(),
+                        DatePicker::make('created_until')
+                            ->native(false)
+                            ->closeOnDateSelection(),
+                    ])
+                    ->indicateUsing(function (array $data): array {
+                        $indicators = [];
+
+                        if ($data['created_from'] ?? null) {
+                            $indicators[] = Indicator::make('Created from ' . Carbon::parse($data['created_from'])->toFormattedDateString())
+                                ->removeField('created_from');
+                        }
+
+                        if ($data['created_until'] ?? null) {
+                            $indicators[] = Indicator::make('Created until ' . Carbon::parse($data['created_until'])->toFormattedDateString())
+                                ->removeField('created_until');
+                        }
+
+                        return $indicators;
+                    })
+                    ->query(function (Builder $query, array $data): Builder {
+                        return $query
+                            ->when(
+                                $data['created_from'],
+                                fn (Builder $query, $date): Builder => $query->whereDate('created_at', '>=', $date),
+                            )
+                            ->when(
+                                $data['created_until'],
+                                fn (Builder $query, $date): Builder => $query->whereDate('created_at', '<=', $date),
+                            );
                     })
             ])
             ->actions([
