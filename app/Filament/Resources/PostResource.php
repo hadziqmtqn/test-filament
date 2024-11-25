@@ -6,10 +6,10 @@ use App\Filament\Resources\PostResource\Pages;
 use App\Models\Category;
 use App\Models\Post;
 use App\Models\SubCategory;
-use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\Placeholder;
 use Filament\Forms\Components\RichEditor;
 use Filament\Forms\Components\Select;
+use Filament\Forms\Components\SpatieMediaLibraryFileUpload;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Form;
 use Filament\Forms\Get;
@@ -19,7 +19,7 @@ use Filament\Tables\Actions\DeleteAction;
 use Filament\Tables\Actions\DeleteBulkAction;
 use Filament\Tables\Actions\EditAction;
 use Filament\Tables\Actions\ViewAction;
-use Filament\Tables\Columns\ImageColumn;
+use Filament\Tables\Columns\SpatieMediaLibraryImageColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
@@ -50,19 +50,23 @@ class PostResource extends Resource
                     ->pluck('name', 'id')),
 
                 TextInput::make('title')
+                    ->columnSpan('full')
                     ->required(),
 
                 RichEditor::make('content')
                     ->fileAttachmentsDisk('s3')
                     ->fileAttachmentsDirectory('attachments')
+                    ->columnSpan('full')
                     ->required(),
 
-                FileUpload::make('image')
-                    ->label('Image')
+                SpatieMediaLibraryFileUpload::make('thumbnail')
+                    ->label('Thumbnail')
                     ->disk('s3')
-                    ->directory('thumbnail')
+                    ->conversionsDisk('s3')
                     ->acceptedFileTypes(['image/png', 'image/jpg', 'image/jpeg'])
                     ->maxSize(500)
+                    ->collection('thumbnail')
+                    ->columnSpan('full')
                     ->nullable(),
 
                 Placeholder::make('created_at')
@@ -83,8 +87,9 @@ class PostResource extends Resource
 
                 TextColumn::make('subCategory.name'),
 
-                ImageColumn::make('image_url')
-                    ->label('Thumbnail'),
+                SpatieMediaLibraryImageColumn::make('thumbnail')
+                    ->label('Thumbnail')
+                    ->collection('thumbnail'),
 
                 TextColumn::make('title')
                     ->searchable()

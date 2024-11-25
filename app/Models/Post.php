@@ -4,19 +4,27 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
+use Spatie\MediaLibrary\HasMedia;
+use Spatie\MediaLibrary\InteractsWithMedia;
 
-class Post extends Model
+class Post extends Model implements HasMedia
 {
+    use InteractsWithMedia;
+
     protected $fillable = [
         'slug',
         'category_id',
-        'image',
         'title',
         'content',
         'sub_category_id'
     ];
+
+    public function registerMediaCollections(): void
+    {
+        $this->addMediaCollection('thumbnail')
+            ->singleFile(); // Koleksi hanya menyimpan satu file
+    }
 
     protected static function boot(): void
     {
@@ -30,11 +38,6 @@ class Post extends Model
     public function getRouteKeyName(): string
     {
         return 'slug';
-    }
-
-    public function getImageUrlAttribute(): ?string
-    {
-        return $this->image ? Storage::disk('s3')->url($this->image) : null;
     }
 
     public function category(): BelongsTo
