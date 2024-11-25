@@ -24,6 +24,7 @@ use Filament\Tables\Actions\EditAction;
 use Filament\Tables\Actions\ViewAction;
 use Filament\Tables\Columns\SpatieMediaLibraryImageColumn;
 use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Filters\Filter;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
@@ -114,11 +115,28 @@ class PostResource extends Resource
                     ->sortable(),
             ])
             ->filters([
-                SelectFilter::make('category_id')
-                    ->label('Category')
-                    ->options(Category::pluck('name', 'id'))
-                    ->searchable()
-                    ->preload(),
+                Filter::make('category')
+                    ->form([
+                        Select::make('category_id')
+                            ->options(Category::pluck('name', 'id'))
+                            ->label('Category')
+                            ->preload()
+                            ->searchable()
+                            ->live()
+                            ->afterStateUpdated(fn (Set $set) => $set('sub_category_id', null)),
+
+                        Select::make('sub_category_id')
+                            ->label('Sub Category')
+                            ->options(fn (Get $get): Collection => SubCategory::query()->where('category_id', $get('category_id'))
+                                ->pluck('name', 'id'))
+                            ->preload()
+                            ->searchable()
+                            ->live(),
+                    ])
+                    ->query(function (Builder $query, array $data) {
+                        return $query->when($data['category_id'], fn (Builder $query, $data): Builder => $query->where('category_id', $data))
+                            ->when($data['sub_category_id'], fn (Builder $query, $data): Builder => $query->where('sub_category_id', $data));
+                    })
             ])
             ->actions([
                 EditAction::make(),
