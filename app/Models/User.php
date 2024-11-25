@@ -7,6 +7,7 @@ use BezhanSalleh\FilamentShield\Traits\HasPanelShield;
 use Database\Factories\UserFactory;
 use Filament\Models\Contracts\FilamentUser;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Str;
@@ -66,5 +67,10 @@ class User extends Authenticatable implements FilamentUser, HasMedia
     public function getRouteKeyName(): string
     {
         return 'username';
+    }
+
+    public function address(): HasOne
+    {
+        return $this->hasOne(Address::class, 'user_id');
     }
 }

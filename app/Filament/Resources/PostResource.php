@@ -36,9 +36,13 @@ class PostResource extends Resource
 {
     protected static ?string $model = Post::class;
 
+    protected static ?string $navigationGroup = 'Post Management';
+
+    protected static ?int $navigationSort = 1;
+
     protected static ?string $slug = 'posts';
 
-    protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
+    protected static ?string $navigationIcon = 'heroicon-o-newspaper';
 
     public static function form(Form $form): Form
     {

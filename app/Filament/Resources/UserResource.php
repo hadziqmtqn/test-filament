@@ -5,6 +5,7 @@ namespace App\Filament\Resources;
 use App\Filament\Resources\UserResource\Pages;
 use App\Models\User;
 use BezhanSalleh\FilamentShield\Contracts\HasShieldPermissions;
+use Filament\Forms\Components\Fieldset;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\SpatieMediaLibraryFileUpload;
 use Filament\Forms\Components\TextInput;
@@ -29,7 +30,7 @@ class UserResource extends Resource implements HasShieldPermissions
 
     protected static ?string $slug = 'users';
 
-    protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
+    protected static ?string $navigationIcon = 'heroicon-o-user-circle';
 
     public static function getPermissionPrefixes(): array
     {
@@ -51,7 +52,7 @@ class UserResource extends Resource implements HasShieldPermissions
                 SpatieMediaLibraryFileUpload::make('avatar')
                     ->collection('avatar')
                     ->maxSize(500)
-                    ->columnSpan('full')
+                    ->columnSpanFull()
                     ->avatar(),
 
                 TextInput::make('name')
@@ -74,6 +75,16 @@ class UserResource extends Resource implements HasShieldPermissions
                     ->dehydrateStateUsing(fn ($state) => $state ? Hash::make($state) : null) // Hash password jika ada
                     ->dehydrated(fn ($state) => filled($state)) // Tidak menyertakan field jika kosong
                     ->required(fn ($context) => $context === 'create'), // Wajib diisi hanya pada create
+
+                Fieldset::make('address')
+                    ->label('Address')
+                    ->relationship('address')
+                    ->schema([
+                        TextInput::make('province'),
+                        TextInput::make('city'),
+                        TextInput::make('district'),
+                        TextInput::make('sub_district'),
+                    ])
             ]);
     }
 
@@ -102,7 +113,8 @@ class UserResource extends Resource implements HasShieldPermissions
             ])
             ->actions([
                 EditAction::make(),
-                DeleteAction::make(),
+                DeleteAction::make()
+                    ->visible(fn (User $record) => $record->id !== auth()->id()),
             ])
             ->bulkActions([
                 BulkActionGroup::make([

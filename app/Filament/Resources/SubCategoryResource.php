@@ -22,9 +22,13 @@ class SubCategoryResource extends Resource
 {
     protected static ?string $model = SubCategory::class;
 
+    protected static ?string $navigationGroup = 'Post Management';
+
+    protected static ?int $navigationSort = 3;
+
     protected static ?string $slug = 'sub-categories';
 
-    protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
+    protected static ?string $navigationIcon = 'heroicon-o-folder-open';
 
     public static function form(Form $form): Form
     {
@@ -33,7 +37,8 @@ class SubCategoryResource extends Resource
                 Select::make('category_id')
                     ->options(Category::pluck('name', 'id'))
                     ->label('Category')
-                    ->required(),
+                    ->required()
+                    ->native(false),
 
                 TextInput::make('name')
                     ->required()
