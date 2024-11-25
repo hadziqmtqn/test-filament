@@ -4,7 +4,6 @@ namespace Database\Seeders;
 
 use App\Models\Category;
 use App\Models\User;
-// use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Hash;
 use Spatie\Permission\Models\Permission;
@@ -35,7 +34,7 @@ class DatabaseSeeder extends Seeder
 
         $superAdmin = User::factory()->create([
             'name' => 'Admin',
-            'email' => 'admin@admin.com',
+            'email' => 'khadziq@bkn.my.id',
             'password' => Hash::make('12345678')
         ]);
         $superAdmin->assignRole($superAdminrole);
