@@ -6,6 +6,7 @@ use App\Filament\Resources\PostResource\Pages;
 use App\Models\Category;
 use App\Models\Post;
 use App\Models\SubCategory;
+use Exception;
 use Filament\Forms\Components\Placeholder;
 use Filament\Forms\Components\RichEditor;
 use Filament\Forms\Components\Select;
@@ -21,6 +22,7 @@ use Filament\Tables\Actions\EditAction;
 use Filament\Tables\Actions\ViewAction;
 use Filament\Tables\Columns\SpatieMediaLibraryImageColumn;
 use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Collection;
@@ -41,13 +43,16 @@ class PostResource extends Resource
                     ->label('Category')
                     ->options(Category::pluck('name', 'id'))
                     ->live()
+                    ->searchable()
+                    ->preload()
                     ->required(),
 
                 Select::make('sub_category_id')
                     ->label('Sub Category')
                     ->options(fn (Get $get): Collection => SubCategory::query()
                     ->where('category_id', $get('category_id'))
-                    ->pluck('name', 'id')),
+                    ->pluck('name', 'id'))
+                    ->searchable(),
 
                 TextInput::make('title')
                     ->columnSpan('full')
@@ -78,6 +83,9 @@ class PostResource extends Resource
             ]);
     }
 
+    /**
+     * @throws Exception
+     */
     public static function table(Table $table): Table
     {
         return $table
@@ -95,7 +103,11 @@ class PostResource extends Resource
                     ->sortable(),
             ])
             ->filters([
-                //
+                SelectFilter::make('category_id')
+                    ->label('Category')
+                    ->options(Category::pluck('name', 'id'))
+                    ->searchable()
+                    ->preload(),
             ])
             ->actions([
                 EditAction::make(),
