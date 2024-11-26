@@ -12,6 +12,7 @@ use Filament\Tables\Actions\BulkActionGroup;
 use Filament\Tables\Actions\DeleteAction;
 use Filament\Tables\Actions\DeleteBulkAction;
 use Filament\Tables\Actions\EditAction;
+use Filament\Tables\Actions\ViewAction;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
 
@@ -59,6 +60,11 @@ class LetterBodyResource extends Resource
             ->actions([
                 EditAction::make(),
                 DeleteAction::make(),
+                ViewAction::make('show')
+                    ->label('Show')
+                    ->icon('heroicon-o-eye')
+                    ->color('primary')
+                    ->url(fn(LetterBody $record): string => static::getUrl('view', ['record' => $record]))
             ])
             ->bulkActions([
                 BulkActionGroup::make([
@@ -73,6 +79,7 @@ class LetterBodyResource extends Resource
             'index' => Pages\ListLetterBodies::route('/'),
             'create' => Pages\CreateLetterBody::route('/create'),
             'edit' => Pages\EditLetterBody::route('/{record:slug}/edit'),
+            'view' => Pages\ViewLetterBody::route('{record:slug}/show')
         ];
     }
 
