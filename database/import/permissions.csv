@@ -48,3 +48,13 @@ update_user
 delete_user
 delete_any_user
 publish_user
+view_any_letter::body
+view_letter::body
+create_letter::body
+update_letter::body
+delete_letter::body
+restore_letter::body
+force_delete_letter::body
+delete_any_letter::body
+restore_any_letter::body
+force_delete_any_letter::body

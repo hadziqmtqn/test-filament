@@ -11,7 +11,7 @@ return new class extends Migration {
             $table->id();
             $table->string('slug')->unique();
             $table->unsignedBigInteger('category_id');
-            $table->string('name')->unique();
+            $table->string('name');
             $table->timestamps();
 
             $table->foreign('category_id')->references('id')->on('categories')->restrictOnDelete();
