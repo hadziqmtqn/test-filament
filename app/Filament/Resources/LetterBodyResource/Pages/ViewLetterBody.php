@@ -14,7 +14,8 @@ class ViewLetterBody extends ViewRecord
     protected function getActions(): array
     {
         return [
-            EditAction::make(), // Tambahkan aksi edit jika diperlukan
+            EditAction::make()
+                ->color('warning'), // Tambahkan aksi edit jika diperlukan
         ];
     }
 }
