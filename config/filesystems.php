@@ -67,7 +67,7 @@ return [
             'endpoint' => env('OBJECT_STORAGE_ENDPOINT'),
             'use_path_style_endpoint' => env('OBJECT_STORAGE_USE_PATH_STYLE', false),
             'throw' => false,
-            'visibility' => 'public'
+            'visibility' => 'private'
         ],
     ],
 
